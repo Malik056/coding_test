@@ -21,6 +21,7 @@ class HorizontalImageListWidget extends StatelessWidget {
       return SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: List.generate(
             images.length,
             (index) => GestureDetector(
@@ -30,23 +31,26 @@ class HorizontalImageListWidget extends StatelessWidget {
                     ? ShapeDecoration(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
-                          side:
-                              BorderSide(color: Theme.of(context).primaryColor),
+                          side: BorderSide(
+                            color: Theme.of(context).primaryColor,
+                            width: 4,
+                          ),
                         ),
                       )
                     : null,
                 margin: EdgeInsets.symmetric(horizontal: 10),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(20-4.0),
                   child: CachedNetworkImage(
                     imageUrl: images[index].url,
                     fadeInDuration: Duration.zero,
                     fadeOutDuration: Duration.zero,
                     fit: BoxFit.cover,
                     progressIndicatorBuilder:
-                        (context, url, downloadProgress) =>
-                            CircularProgressIndicator(
-                                value: downloadProgress.progress),
+                        (context, url, downloadProgress) => Center(
+                      child: CircularProgressIndicator(
+                          value: downloadProgress.progress),
+                    ),
                     errorWidget: (context, url, error) => Icon(Icons.error),
                     height: height,
                     width: height,
@@ -56,12 +60,20 @@ class HorizontalImageListWidget extends StatelessWidget {
             ),
           )..add(
               Center(
-                child: FlatButton(
-                  onPressed: onAddNewImage,
+                child: GestureDetector(
+                  onTap: onAddNewImage,
                   child: Container(
+                    margin: EdgeInsets.symmetric(horizontal:10),
                     width: height,
                     height: height,
-                    color: Theme.of(context).primaryColor.withAlpha(100),
+                    decoration: ShapeDecoration(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        // side: BorderSide(color: Theme.of(context).primaryColor),
+                      ),
+                      color: Theme.of(context).primaryColor.withAlpha(100),
+                    ),
+                    alignment: Alignment.center,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [

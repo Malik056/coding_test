@@ -13,7 +13,7 @@ class HomeRouteController {
   static final _imagePicker = ImagePicker();
   static Future<List<ImageObject>> getImages(String uid) async {
     var snapshot = await FirebaseFirestore.instance
-        .collection('images')
+        .collection('scans')
         .where('uid', isEqualTo: uid)
         .get();
     if (snapshot.docs.isEmpty) {
@@ -65,54 +65,69 @@ class HomeRouteController {
 
   static Future<ImageObject> pickImage(BuildContext context, String uid,
       GlobalKey<ScaffoldState> scaffoldKey) async {
-    var imageObject = await showCupertinoDialog<ImageObject>(
+    var imageObject = await showDialog<ImageObject>(
         context: context,
         builder: (ctx) {
-          return Container(
-            width: MediaQuery.of(context).size.width * 0.7,
-            decoration: ShapeDecoration(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  height: 10,
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.7,
+              decoration: ShapeDecoration(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text('Please select a source for the image'),
-                ),
-                SizedBox(height: 10),
-                Divider(),
-                Row(
-                  children: [
-                    Expanded(
-                        child: FlatButton(
-                      onPressed: () async {
-                        BotToast.showLoading();
-                        var pickedImage = await _imagePicker.getImage(
-                            source: ImageSource.camera);
-                        _handleImage(context, uid, scaffoldKey, pickedImage);
-                      },
-                      child: Text('Camera'),
-                    )),
-                    VerticalDivider(width: 2),
-                    Expanded(
-                        child: FlatButton(
-                      child: Text("Gallery"),
-                      onPressed: () async {
-                        BotToast.showLoading();
-                        var pickedImage = await _imagePicker.getImage(
-                            source: ImageSource.gallery);
-                        _handleImage(context, uid, scaffoldKey, pickedImage);
-                      },
-                    )),
-                  ],
-                ),
-              ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "Pick Image",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text('Please select a source for the image'),
+                  ),
+                  SizedBox(height: 10),
+                  Divider(),
+                  Row(
+                    children: [
+                      Expanded(
+                          child: FlatButton(
+                        onPressed: () async {
+                          BotToast.showLoading();
+                          var pickedImage = await _imagePicker.getImage(
+                              source: ImageSource.camera);
+                          _handleImage(context, uid, scaffoldKey, pickedImage);
+                        },
+                        child: Text('Camera'),
+                      )),
+                      VerticalDivider(width: 2),
+                      Expanded(
+                          child: FlatButton(
+                        child: Text("Gallery"),
+                        onPressed: () async {
+                          BotToast.showLoading();
+                          var pickedImage = await _imagePicker.getImage(
+                              source: ImageSource.gallery);
+                          _handleImage(context, uid, scaffoldKey, pickedImage);
+                        },
+                      )),
+                    ],
+                  ),
+                ],
+              ),
             ),
           );
         });

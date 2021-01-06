@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:coding_test/models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../globals/globals.dart' as globals;
 
 class WelcomeController {
   static Future<MyUser> getSignedInUser() async {
@@ -21,7 +22,8 @@ class WelcomeController {
         }
         return null;
       }
-      return MyUser.fromJson(userData.data());
+      globals.user = MyUser.fromJson(userData.data())..userId = user.uid;
+      return globals.user;
     }
   }
 }

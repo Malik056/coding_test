@@ -74,7 +74,7 @@ class MyTextFormField extends StatelessWidget {
               color: Theme.of(context).disabledColor,
             ),
       ),
-      obscureText: obsecureText,
+      obscureText: obsecureText ?? false,
       // onChanged: (value) {
       //   setState(() {
       //     user.confirmPassword = value.trim();

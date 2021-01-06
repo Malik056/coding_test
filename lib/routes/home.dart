@@ -6,6 +6,7 @@ import 'package:coding_test/widgets/horizontal_images.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 import '../globals/globals.dart' as globals;
 
 class HomeRoute extends StatefulWidget {
@@ -17,12 +18,31 @@ class HomeRoute extends StatefulWidget {
 
 class _HomeRouteState extends State<HomeRoute> {
   int selectedImage = 0;
-  Future<List<ImageObject>> _fetchImages;
+  bool _loading = true;
+  bool error = false;
+  List<ImageObject> images = [];
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  initialize() async {
+    HomeRouteController.getImages(globals.user.userId).then(
+      (value) {
+        images = value ?? [];
+        setState(() {
+          error = false;
+          _loading = false;
+        });
+      },
+    ).catchError((err) {
+      print(err);
+      _loading = false;
+      error = true;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    _fetchImages = HomeRouteController.getImages(globals.user.userId);
+    initialize();
   }
 
   @override
@@ -46,67 +66,72 @@ class _HomeRouteState extends State<HomeRoute> {
               })
         ],
       ),
-      body: FutureBuilder<List<ImageObject>>(
-          future: _fetchImages,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            }
-            if (snapshot.hasError) {
-              Center(
-                child: InkWell(
-                  onTap: () {
-                    setState(() {
-                      _fetchImages = HomeRouteController.getImages(
-                          FirebaseAuth.instance.currentUser.uid);
-                    });
-                  },
-                  child: Column(
-                    children: [
-                      Icon(Icons.error),
-                      Text("An error occurred, Tap to reload!")
-                    ],
-                  ),
+      body: ModalProgressHUD(
+        inAsyncCall: _loading,
+        child: Builder(builder: (ctx) {
+          if (error) {
+            return Center(
+              child: InkWell(
+                onTap: () {
+                  initialize();
+                },
+                child: Column(
+                  children: [
+                    Icon(Icons.error),
+                    Text("An error occurred, Tap to reload!")
+                  ],
                 ),
-              );
-            }
-            return snapshot.data.isEmpty == true
-                ? Center(
-                    child: InkWell(
-                      onTap: () {
-                        //TODO
-                      },
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.cloud_upload,
-                            color: primaryColor,
-                            size: 40,
-                          ),
-                          SizedBox(height: 10),
-                          Text('Upload Image'),
-                        ],
-                      ),
+              ),
+            );
+          }
+          return images.isEmpty == true
+              ? Center(
+                  child: InkWell(
+                    onTap: () async {
+                      var image = await HomeRouteController.pickImage(
+                          context, globals.user.userId, _scaffoldKey);
+                      if (image != null) {
+                        setState(() {
+                          selectedImage = images.length;
+                          images.add(image);
+                        });
+                      }
+                    },
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.cloud_upload,
+                          color: primaryColor,
+                          size: 40,
+                        ),
+                        SizedBox(height: 10),
+                        Text('Upload Image'),
+                      ],
                     ),
-                  )
-                : Column(
+                  ),
+                )
+              : Center(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
                         flex: 9,
-                        child: Image.network(snapshot.data[0].url),
+                        child: Image.network(images[0].url),
                       ),
-                      SizedBox(height: 10),
+                      SizedBox(height: 20),
                       Expanded(
+                        flex: 2,
                         child: HorizontalImageListWidget(
                           selectedImage: selectedImage,
+                          images: images,
                           onAddNewImage: () async {
                             var image = await HomeRouteController.pickImage(
                                 context, globals.user.userId, _scaffoldKey);
                             if (image != null) {
                               setState(() {
-                                snapshot.data.add(image);
-                                selectedImage = snapshot.data.length;
+                                images.add(image);
+                                selectedImage = images.length - 1;
                               });
                             }
                           },
@@ -116,10 +141,13 @@ class _HomeRouteState extends State<HomeRoute> {
                             });
                           },
                         ),
-                      )
+                      ),
+                      SizedBox(height: 10),
                     ],
-                  );
-          }),
+                  ),
+              );
+        }),
+      ),
     );
   }
 }

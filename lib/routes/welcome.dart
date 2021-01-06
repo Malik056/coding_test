@@ -1,6 +1,7 @@
 import 'package:coding_test/controllers/welcome.dart';
 import 'package:coding_test/models/user.dart';
 import 'package:coding_test/routes/auth.dart';
+import 'package:coding_test/routes/extra_info.dart';
 import 'package:coding_test/routes/login.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,10 @@ class WelcomePage extends StatelessWidget {
             if (snapshot.data == null) {
               Navigator.of(context).pushAndRemoveUntil(
                   CupertinoPageRoute(builder: (ctx) => AuthRoute()),
+                  (route) => false);
+            } else if (snapshot.data.dateOfBirth == null) {
+              Navigator.of(context).pushAndRemoveUntil(
+                  CupertinoPageRoute(builder: (ctx) => ExtraInfoRoute()),
                   (route) => false);
             } else {
               Navigator.of(context).pushAndRemoveUntil(

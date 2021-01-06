@@ -57,114 +57,124 @@ class _ExtraInfoRouteState extends State<ExtraInfoRoute> {
         child: Form(
           key: _formKey,
           child: Center(
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.8,
+              child: SingleChildScrollView(
+                child: Column(
                   children: [
-                    RadioButton(
-                      value: 1,
-                      groupValue: genderSelected,
-                      label: tr('extra_info_male'),
-                      onChanged: (value) {
-                        setState(() {
-                          genderSelected = value;
-                          gender = "Male";
-                        });
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        RadioButton(
+                          value: 1,
+                          groupValue: genderSelected,
+                          label: tr('extra_info_male'),
+                          onChanged: (value) {
+                            setState(() {
+                              genderSelected = value;
+                              gender = "Male";
+                            });
+                          },
+                        ),
+                        RadioButton(
+                            value: 2,
+                            groupValue: genderSelected,
+                            label: tr('extra_info_female'),
+                            onChanged: (value) {
+                              setState(() {
+                                genderSelected = value;
+                                gender = "Female";
+                              });
+                            }),
+                      ],
+                    ),
+                    SizedBox(height: 20),
+                    MyTextFormField(
+                      label: tr('dob_label_short'),
+                      hint: tr('dob_label'),
+                      helperText: "Format: dd/mm/yyyy",
+                      prefix: Icon(Icons.calendar_today),
+                      validator: (text) {
+                        if ((text ?? '').isEmpty) {
+                          return tr('extra_info_dob_missing');
+                        }
+                        dateOfBirth = text;
+                        return null;
                       },
                     ),
-                    RadioButton(
-                        value: 2,
-                        groupValue: genderSelected,
-                        label: tr('extra_info_female'),
-                        onChanged: (value) {
+                    SizedBox(height: 20),
+                    MyTextFormField(
+                      label: tr('favorite_dish_label_short'),
+                      hint: tr('favorite_dish_label'),
+                      prefix: Icon(Icons.food_bank),
+                      validator: (text) {
+                        if (text.isEmpty) {
+                          return tr('extra_info_favorite_dish_missing');
+                        }
+                        favoriteDish = text;
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    MyTextFormField(
+                      label: tr('favorite_soccer_team_label_short'),
+                      hint: tr('favorite_soccer_team_label'),
+                      prefix: Icon(Icons.sports_soccer),
+                      validator: (text) {
+                        if (text.isEmpty) {
+                          return tr('extra_info_favorite_team_missing');
+                        }
+                        favoriteSoccerTeam = text;
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 30),
+                    MyButton(
+                      text: tr('submit_label'),
+                      onPressed: () async {
+                        if (_formKey.currentState.validate()) {
+                          if (genderSelected == null) {
+                            Utils.showInSnackbar(
+                                _scaffoldKey, tr("extra_info_gender_missing"),
+                                bgColor: Colors.red, textColor: Colors.white);
+                            return;
+                          }
                           setState(() {
-                            genderSelected = value;
-                            gender = "Female";
+                            _loading = true;
                           });
-                        }),
+                          MyUser user = MyUser();
+                          user.userId = FirebaseAuth.instance.currentUser.uid;
+                          user.favoriteDish = favoriteDish;
+                          user.favoriteSoccerTeam = favoriteSoccerTeam;
+                          user.gender = gender;
+                          user.dateOfBirth = dateOfBirth;
+                          user.name = globals.user.name;
+                          user.lastName = globals.user.lastName;
+                          user.email = globals.user.email;
+                          String error =
+                              await ExtraInfoController.updateUser(user);
+                          if (error == null) {
+                            globals.user.gender = gender;
+                            globals.user.favoriteSoccerTeam =
+                                favoriteSoccerTeam;
+                            globals.user.favoriteDish = favoriteDish;
+                            globals.user.dateOfBirth = dateOfBirth;
+                            Navigator.of(context).pushAndRemoveUntil(
+                                CupertinoPageRoute(
+                                  builder: (ctx) => HomeRoute(),
+                                ),
+                                (route) => false);
+                          } else {
+                            setState(() {
+                              _loading = false;
+                            });
+                          }
+                        }
+                      },
+                    ),
                   ],
                 ),
-                SizedBox(height: 20),
-                MyTextFormField(
-                  label: tr('dob_label_short'),
-                  hint: tr('dob_label'),
-                  helperText: "Format: dd/mm/yyyy",
-                  prefix: Icon(Icons.calendar_today),
-                  validator: (text) {
-                    if ((text ?? '').isEmpty) {
-                      return tr('extra_info_dob_missing');
-                    }
-                    dateOfBirth = text;
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
-                MyTextFormField(
-                  label: tr('favorite_dish_label_short'),
-                  hint: tr('favorite_dish_label'),
-                  prefix: Icon(Icons.sports_soccer),
-                  validator: (text) {
-                    if (text.isEmpty) {
-                      return tr('extra_info_favorite_dish_missing');
-                    }
-                    favoriteDish = text;
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
-                MyTextFormField(
-                  label: tr('favorite_soccer_team_label_short'),
-                  hint: tr('favorite_soccer_team_label'),
-                  prefix: Icon(Icons.sports_soccer),
-                  validator: (text) {
-                    if (text.isEmpty) {
-                      return tr('extra_info_favorite_team_missing');
-                    }
-                    favoriteSoccerTeam = text;
-                    return null;
-                  },
-                ),
-                SizedBox(height: 30),
-                MyButton(
-                  text: tr('submit_label'),
-                  onPressed: () async {
-                    if (_formKey.currentState.validate()) {
-                      if (genderSelected == null) {
-                        Utils.showInSnackbar(
-                            _scaffoldKey, tr("extra_info_gender_missing"),
-                            bgColor: Colors.red, textColor: Colors.white);
-                        return;
-                      }
-                      setState(() {
-                        _loading = true;
-                      });
-                      MyUser user = MyUser();
-                      user.userId = FirebaseAuth.instance.currentUser.uid;
-                      user.favoriteDish = favoriteDish;
-                      user.favoriteSoccerTeam = favoriteSoccerTeam;
-                      user.gender = gender;
-                      String error =
-                          await ExtraInfoController.updateUser(globals.user);
-                      if (error == null) {
-                        globals.user.gender = gender;
-                        globals.user.favoriteSoccerTeam = favoriteSoccerTeam;
-                        globals.user.favoriteDish = favoriteDish;
-                        globals.user.dateOfBirth = dateOfBirth;
-                        Navigator.of(context).pushAndRemoveUntil(
-                            CupertinoPageRoute(
-                              builder: (ctx) => HomeRoute(),
-                            ),
-                            (route) => false);
-                      } else {
-                        setState(() {
-                          _loading = false;
-                        });
-                      }
-                    }
-                  },
-                ),
-              ],
+              ),
             ),
           ),
         ),

@@ -17,6 +17,7 @@ class AuthAPIs {
           .collection('users')
           .doc(uid)
           .set(user.toJson(), SetOptions(merge: true));
+      user.userId = uid;
       return user;
     } on FirebaseAuthException catch (ex) {
       if (ex.code == "email-already-in-use") {
@@ -49,7 +50,7 @@ class AuthAPIs {
         await userCredential.user.delete();
         return tr("firebase_auth_user_not_exist");
       }
-      return MyUser.fromJson(snapshot.data());
+      return MyUser.fromJson(snapshot.data())..userId = userCredential.user.uid;
     } on FirebaseAuthException catch (ex) {
       if (ex.code == "invalid-email") {
         return tr('firebase_auth_invalid_email');
