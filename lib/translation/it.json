@@ -1,0 +1,15 @@
+{
+    "firebase_auth_email_already_exists_leading": "An Account with this email ",
+    "firebase_auth_email_already_exists_trailing": "already exists. Please Login.",
+    "firebase_auth_invalid_email_address": "The email address is not valid. Please enter again",
+    "firebase_auth_weak_password": "Your password is weak, Please enter a strong password",
+    "firebase_auth_user_disabled": "This user is disabled",
+    "firebase_auth_wrong_password": "The password you entered is not correct",
+    "name_validator_empty_name": "Name cannot be empty",
+    "name_validator_not_enough_letters": "Name should at least contain 3 letters",
+    "email_validator_empty_email": "Email cannot be empty",
+    "email_validator_invalid_format": "The format of email address is not valid",
+    "password_validator_empty_password": "Password cannot be empty",
+    "password_validator_not_enough_length": "Password should at least contain 6 letters",
+    "general_unexpected_error": "Unexpected error occurred! Please try again"
+}
