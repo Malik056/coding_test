@@ -5,8 +5,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthAPIs {
-  /// return Future that resolves to `null` if there are no error
-  /// return Future that resolves to [String] containing error description when there is an error
+  /// returns Future that resolves to [MyUser] if there are no errors
+  ///
+  /// returns Future that resolves to [String]
+  ///  containing error description when there is an error
   static Future<dynamic> signupUser(MyUser user) async {
     try {
       var credential = await FirebaseAuth.instance
@@ -35,10 +37,9 @@ class AuthAPIs {
     }
   }
 
-  ///param [email] is user email
-  ///param [password] is user password
-  ///return type is [String] if error occurrs containig error description
-  ///return type is [MyUser] if signin Successfull
+  ///return a [String] if there is an error which contains error description
+  ///
+  ///returns object of type [MyUser] if signin is Successfull
   static Future<dynamic> signIn(String email, password) async {
     try {
       var userCredential = await FirebaseAuth.instance

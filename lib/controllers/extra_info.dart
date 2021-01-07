@@ -3,8 +3,9 @@ import 'package:coding_test/models/user.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class ExtraInfoController {
-  ///returns `null` if there is no error
-  ///returns [String] containing error description
+  ///returns a Future resolves to `null` if there is no error
+  ///
+  ///returns a Future resolves to [String] containing error description
   static Future<String> updateUser(MyUser user) async {
     try {
       await FirebaseFirestore.instance

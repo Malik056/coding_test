@@ -112,8 +112,8 @@ class _HomeRouteState extends State<HomeRoute> {
                   ),
                 )
               : Center(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
                         flex: 9,
@@ -145,7 +145,7 @@ class _HomeRouteState extends State<HomeRoute> {
                       SizedBox(height: 10),
                     ],
                   ),
-              );
+                );
         }),
       ),
     );

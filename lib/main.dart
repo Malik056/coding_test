@@ -7,32 +7,30 @@ import 'package:flutter/material.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(
-    EasyLocalization(
-      supportedLocales: [Locale('en'), Locale('it')],
-      useOnlyLangCode: true,
-      path: "lib/translation",
-      child: MyApp(),
-    ),
-  );
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      builder: BotToastInit(), //1. call BotToastInit
-      navigatorObservers: [
-        BotToastNavigatorObserver(),
-      ], //2. registered route observer
-      title: 'Code Test',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        accentColor: Colors.orange[300],
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+    return EasyLocalization(
+      supportedLocales: [Locale('en'), Locale('it')],
+      useOnlyLangCode: true,
+      path: "lib/translation",
+      child: MaterialApp(
+        builder: BotToastInit(), //1. call BotToastInit
+        navigatorObservers: [
+          BotToastNavigatorObserver(),
+        ], //2. registered route observer
+        title: 'Code Test',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          accentColor: Colors.orange[300],
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        home: WelcomePage(),
       ),
-      home: WelcomePage(),
     );
   }
 }
